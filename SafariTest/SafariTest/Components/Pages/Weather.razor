@@ -1,5 +1,6 @@
 ﻿@page "/weather"
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 
 <PageTitle>Weather</PageTitle>
 
@@ -15,6 +16,21 @@
 }
 else
 {
+    <div id="dropdown" class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="ToggleDropdown">
+            @selectedSummary
+        </button>
+        <div class="dropdown-menu @(isOpen ? "show" : "")">
+            @foreach (var item in summaryOptions)
+            {
+                <button class="dropdown-item" @onclick="() => SelectItem(item)">
+                    @item
+                </button>
+            }
+        </div>
+    </div>
+    <label>Selected Summary:</label>
+    <p>@selectedSummary</p>
     <table class="table">
         <thead>
         <tr>
@@ -41,6 +57,13 @@ else
 @code {
     private WeatherForecast[]? forecasts;
 
+    private bool isOpen;
+
+    private void ToggleDropdown() => isOpen = !isOpen;
+    private string selectedSummary = string.Empty;
+
+    private List<string> summaryOptions = [];
+
     protected override async Task OnInitializedAsync()
     {
         // Simulate asynchronous loading to demonstrate streaming rendering
@@ -54,6 +77,7 @@ else
             TemperatureC = Random.Shared.Next(-20, 55),
             Summary = summaries[Random.Shared.Next(summaries.Length)]
         }).ToArray();
+        summaryOptions = forecasts.Select(x => x.Summary!).ToList();
     }
 
     private class WeatherForecast
@@ -62,6 +86,12 @@ else
         public int TemperatureC { get; set; }
         public string? Summary { get; set; }
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+    private void SelectItem(string item)
+    {
+        selectedSummary = item;
+        isOpen = false;
     }
 
 }

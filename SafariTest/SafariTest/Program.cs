@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using NLog.Web;
 using SafariTest.Components;
 
@@ -10,6 +11,10 @@ builder.Host.UseNLog();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// auth
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+builder.Services.AddAuthorization(opts => opts.FallbackPolicy = opts.DefaultPolicy);
 
 var app = builder.Build();
 
